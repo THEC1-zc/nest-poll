@@ -15,6 +15,11 @@ export default function Home() {
   const [yesVoters, setYesVoters] = useState<{ farcasterName: string | null; walletAddress: string }[]>([]);
   const [choice, setChoice] = useState<string | null>(null);
   const [fcUser, setFcUser] = useState<any>(null);
+  const displayName = fcUser?.username
+    ? `@${fcUser.username}`
+    : address
+      ? `${address.slice(0, 6)}...${address.slice(-4)}`
+      : 'Connected wallet';
 
   useEffect(() => {
     const init = async () => {
@@ -95,7 +100,7 @@ export default function Home() {
         <div className="bg-white p-8 rounded-2xl shadow-xl border border-indigo-50 w-full">
           <div className="flex justify-between items-center mb-6">
             <span className="text-sm text-gray-500 font-mono bg-gray-100 px-3 py-1 rounded-full">
-              {fcUser?.username ? `@${fcUser.username}` : `${address.slice(0, 6)}...${address.slice(-4)}`}
+              {displayName}
             </span>
             <button onClick={() => disconnect()} className="text-xs text-red-500 hover:underline">
               Disconnect
