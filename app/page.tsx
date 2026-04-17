@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
-import { Loader2, CheckCircle2, XCircle, Users } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Users, Check, X } from 'lucide-react';
 import sdk from '@farcaster/miniapp-sdk';
 import { WalletMenu } from '@/components/WalletMenu';
 
@@ -38,7 +38,7 @@ export default function Home() {
 
   const checkExistingVote = async () => {
     try {
-      const res = await fetch(`/api/vote?address=${address}`);
+      const res = await fetch(`/api/vote?address=${address}`, { cache: 'no-store' });
       const data = await res.json();
       if (data && data.choice) {
         setVoted(true);
@@ -51,7 +51,7 @@ export default function Home() {
 
   const fetchVoters = async () => {
     try {
-      const res = await fetch('/api/vote');
+      const res = await fetch('/api/vote', { cache: 'no-store' });
       const data = await res.json();
       if (data && data.yesVoters) {
         setYesVoters(data.yesVoters);
@@ -100,106 +100,121 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-6 max-w-lg mx-auto flex flex-col items-center">
-      {/* Header replicated logic */}
-      <header className="w-full flex justify-between items-center mb-12">
-        <div className="brand">
-          <h2 className="text-xl font-bold text-accent-3 uppercase tracking-widest">NEST</h2>
-        </div>
+    <div className="flex flex-col items-center min-h-screen">
+      <header className="app-header">
         <WalletMenu fcUser={fcUser} />
       </header>
 
-      <div className="w-full space-y-8">
-        <section className="cartoon-panel p-8">
-          <h1 className="text-4xl font-black mb-6 text-center leading-tight uppercase italic tracking-tighter text-black">
-            Next Gen Eggs?
+      <main className="w-full max-w-[480px] p-4 flex flex-col gap-6 items-center">
+        <section className="poll-panel">
+          <h1 className="hero-title">
+            The Next Gen
           </h1>
           
-          <p className="text-xl font-medium text-muted text-center mb-8 leading-relaxed">
-            Support the launch of the new token for the next generation of the eggs project!
+          <p className="poll-text">
+            Would you buy one or all the early supporter NFT to launch the token that will be used for the next generation of the eggs project?
             <br />
-            <span className="text-sm text-accent mt-3 block font-bold uppercase tracking-widest bg-yellow-200 inline-block px-2 py-1 rounded-lg border-2 border-black">
-              All income goes to Liquidity Pool
+            <span className="text-sm text-accent mt-3 block font-bold uppercase tracking-widest">
+              (All income will go for initial liquidity pool)
             </span>
           </p>
 
           {!isConnected ? (
-             <div className="text-center py-4 text-black font-bold text-lg bg-yellow-100 border-4 border-dashed border-black rounded-2xl">
-                Connect your wallet to vote!
+             <div className="text-center py-6 px-4 bg-white/5 border border-dashed border-card-border rounded-2xl text-muted-soft">
+                PLEASE LOGIN WITH YOUR WALLET TO VOTE.
              </div>
           ) : !voted ? (
-            <div className="flex flex-col gap-5">
-              <button
-                disabled={loading}
-                onClick={() => handleVote('yes')}
-                className="cartoon-button-yes flex items-center justify-center gap-3 text-black py-5 rounded-2xl font-black text-xl uppercase tracking-wider hover:translate-x-[-2px] hover:translate-y-[-2px] hover:box-shadow-[6px_6px_0px_#000]"
-              >
-                {loading ? <Loader2 className="animate-spin" /> : <CheckCircle2 strokeWidth={3} />}
-                Yes, Count me in!
-              </button>
-              <button
-                disabled={loading}
-                onClick={() => handleVote('no')}
-                className="cartoon-button-no flex items-center justify-center gap-3 text-black py-5 rounded-2xl font-black text-xl uppercase tracking-wider hover:translate-x-[-2px] hover:translate-y-[-2px] hover:box-shadow-[6px_6px_0px_#000]"
-              >
-                {loading ? <Loader2 className="animate-spin" /> : <XCircle strokeWidth={3} />}
-                No thanks
-              </button>
+            <div className="flex flex-col gap-6 w-full">
+              <div className="vote-button-grid">
+                <button
+                  disabled={loading}
+                  onClick={() => handleVote('yes')}
+                  className="vote-button vote-button-yes"
+                >
+                  {loading ? <Loader2 className="animate-spin" /> : <Check size={32} strokeWidth={3} />}
+                  <span>Yes</span>
+                </button>
+
+                <button
+                  disabled={loading}
+                  onClick={() => handleVote('no')}
+                  className="vote-button vote-button-no"
+                >
+                  {loading ? <Loader2 className="animate-spin" /> : <X size={32} strokeWidth={3} />}
+                  <span>No</span>
+                </button>
+              </div>
+
+              <div className="vote-button-grid">
+                 <div className="flex flex-col items-center gap-1">
+                    <span className="text-2xl font-bold text-green-400">{summary.yes}</span>
+                    <span className="text-[10px] uppercase tracking-widest opacity-60">Votes Yes</span>
+                 </div>
+                 <div className="flex flex-col items-center gap-1">
+                    <span className="text-2xl font-bold text-red-400">{summary.no}</span>
+                    <span className="text-[10px] uppercase tracking-widest opacity-60">Votes No</span>
+                 </div>
+              </div>
             </div>
           ) : (
-            <div className="py-8 text-black font-black flex flex-col items-center gap-4 bg-green-100 rounded-3xl border-4 border-black shadow-[4px_4px_0px_#000]">
-              <CheckCircle2 size={64} strokeWidth={3} className="text-green-600" />
-              <p className="text-3xl uppercase italic tracking-tighter">You Voted: {choice?.toUpperCase()}!</p>
+            <div className="flex flex-col gap-8 w-full">
+              <div className="py-8 text-green-400 font-bold flex flex-col items-center gap-4 bg-white/5 rounded-3xl border border-green-500/30">
+                <CheckCircle2 size={54} strokeWidth={2.5} />
+                <div className="flex flex-col items-center gap-1">
+                  <p className="text-xs uppercase tracking-[0.2em] opacity-60">Your Choice</p>
+                  <p className="text-3xl uppercase tracking-widest italic">{choice}</p>
+                </div>
+              </div>
+
+              <div className="vote-button-grid">
+                 <div className="flex flex-col items-center gap-1">
+                    <span className="text-2xl font-bold text-green-400">{summary.yes}</span>
+                    <span className="text-[10px] uppercase tracking-widest opacity-60">Votes Yes</span>
+                 </div>
+                 <div className="flex flex-col items-center gap-1">
+                    <span className="text-2xl font-bold text-red-400">{summary.no}</span>
+                    <span className="text-[10px] uppercase tracking-widest opacity-60">Votes No</span>
+                 </div>
+              </div>
             </div>
           )}
         </section>
 
-        {/* Vote Counter Section */}
-        <section className="grid grid-cols-2 gap-6">
-          <div className="cartoon-card p-6 rounded-3xl flex flex-col items-center justify-center bg-green-50">
-            <span className="text-5xl font-black text-green-600">{summary.yes}</span>
-            <span className="text-sm uppercase font-black tracking-widest text-black mt-2">YES!</span>
-          </div>
-          <div className="cartoon-card p-6 rounded-3xl flex flex-col items-center justify-center bg-red-50">
-            <span className="text-5xl font-black text-red-600">{summary.no}</span>
-            <span className="text-sm uppercase font-black tracking-widest text-black mt-2">NOPE</span>
-          </div>
-          <div className="col-span-2 cartoon-card p-4 rounded-3xl flex justify-between items-center px-8 bg-blue-50">
-            <span className="text-lg uppercase font-black tracking-widest text-black">Total Votes</span>
-            <span className="text-3xl font-black text-blue-600">{summary.total}</span>
-          </div>
-        </section>
-
-        <section className="w-full">
-          <h2 className="text-2xl font-black mb-6 flex items-center justify-center gap-3 text-black uppercase italic tracking-tighter">
-            <Users className="text-black" size={28} strokeWidth={3} />
-            The Squad
+        <section className="w-full flex flex-col gap-4 mt-4">
+          <h2 className="text-lg font-bold flex items-center justify-center gap-3 text-muted uppercase tracking-[0.15em]">
+            <Users size={18} />
+            Supporters Squad
           </h2>
-          <div className="grid grid-cols-1 gap-4">
+          
+          <div className="supporter-list">
             {yesVoters.length > 0 ? (
               yesVoters.map((voter, i) => (
-                <div key={i} className="cartoon-card p-5 rounded-2xl flex items-center gap-5 hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform">
-                  <div className="w-12 h-12 bg-yellow-300 rounded-full flex items-center justify-center text-black font-black border-4 border-black text-xl shadow-[2px_2px_0px_#000]">
+                <div key={i} className="supporter-card">
+                  <div className="wallet-avatar">
                     {voter.farcasterName ? voter.farcasterName[0].toUpperCase() : 'W'}
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-black text-black text-lg">
-                      {voter.farcasterName ? `@${voter.farcasterName}` : 'Anonymous'}
+                  <div className="supporter-info">
+                    <span className="supporter-name">
+                      {voter.farcasterName ? `@${voter.farcasterName}` : 'Anonymous Voter'}
                     </span>
-                    <span className="text-xs text-muted font-bold">
-                      {voter.walletAddress.slice(0, 14)}...
+                    <span className="supporter-address">
+                      {voter.walletAddress.slice(0, 6)}...{voter.walletAddress.slice(-4)}
                     </span>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-center text-black font-bold italic py-10 border-4 border-dashed border-black rounded-3xl bg-white/50">
-                Waitin' for the first supporter... 🥚
-              </p>
+              <div className="text-center py-10 opacity-40 italic text-sm">
+                No supporters recorded yet.
+              </div>
             )}
           </div>
         </section>
-      </div>
-    </main>
+
+        <footer className="mt-8 mb-12 opacity-30 text-[10px] uppercase tracking-widest">
+           NEST Poll • Next Generation
+        </footer>
+      </main>
+    </div>
   );
 }

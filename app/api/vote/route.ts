@@ -12,9 +12,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
+    const normalizedAddress = walletAddress.toLowerCase();
+
     // Verify signature
     const isValid = await verifyMessage({
-      address: walletAddress as `0x${string}`,
+      address: normalizedAddress as `0x${string}`,
       message,
       signature: signature as `0x${string}`,
     });
@@ -25,7 +27,7 @@ export async function POST(request: Request) {
 
     // Check if the user has already voted
     const existingVote = await prisma.vote.findUnique({
-      where: { walletAddress },
+      where: { walletAddress: normalizedAddress },
     });
 
     if (existingVote) {
@@ -33,12 +35,13 @@ export async function POST(request: Request) {
     }
 
     const vote = await prisma.vote.create({
-      data: { walletAddress, farcasterName, choice },
+      data: { walletAddress: normalizedAddress, farcasterName, choice },
     });
 
     return NextResponse.json(vote);
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('VOTE POST ERROR:', error);
+    return NextResponse.json({ error: 'Internal server error', details: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -49,7 +52,7 @@ export async function GET(request: Request) {
 
     if (address) {
       const userVote = await prisma.vote.findUnique({
-        where: { walletAddress: address },
+        where: { walletAddress: address.toLowerCase() },
         select: { choice: true }
       });
       return NextResponse.json(userVote);
