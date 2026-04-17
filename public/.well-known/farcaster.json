@@ -1,0 +1,16 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjk3OTY4MiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDM5NzdiOTM1OEQyQ0E4ODlERTQ1RkIxNjMwYjY2MDMwYUE3YUNENUIifQ",
+    "payload": "eyJkb21haW4iOiJuZXN0LXBvbGwudmVyY2VsLmFwcCJ9",
+    "signature": "MHhkMDY1MDIwMjFhNmFlMDUwZmVjMDMxYTlkMTk2OGIxOTY1NGIxMzI5NGU3MjNjNWQ2NDUyNmZjNDhkYzcyNDY0NmMzNWM3Yzg5OWUyYTdmMmRmZWY0YTAwMjcxOWY1OWRkNjg2YTg5NWNjY2I2MGIyNGE3MTM1Nzc5YTM0ZTY2OTFj"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "NEST Poll",
+    "iconUrl": "https://nest-poll.vercel.app/icon.png",
+    "homeUrl": "https://nest-poll.vercel.app",
+    "description": "Vote for the next generation of NEST Eggs",
+    "splashImageUrl": "https://nest-poll.vercel.app/splash.png",
+    "splashBackgroundColor": "#ffef96"
+  }
+}

@@ -12,6 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [voted, setVoted] = useState(false);
   const [yesVoters, setYesVoters] = useState<{ farcasterName: string | null; walletAddress: string }[]>([]);
+  const [summary, setSummary] = useState({ yes: 0, no: 0, total: 0 });
   const [choice, setChoice] = useState<string | null>(null);
   const [fcUser, setFcUser] = useState<any>(null);
 
@@ -51,8 +52,9 @@ export default function Home() {
     try {
       const res = await fetch('/api/vote');
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setYesVoters(data);
+      if (data && data.yesVoters) {
+        setYesVoters(data.yesVoters);
+        setSummary(data.summary);
       }
     } catch (err) {
       console.error('Failed to fetch voters');
@@ -99,75 +101,91 @@ export default function Home() {
       </header>
 
       <div className="w-full space-y-8">
-        <section className="bg-panel border border-card-border p-8 rounded-[32px] shadow-2xl backdrop-blur-md">
-          <h1 className="text-3xl font-bold mb-6 text-center leading-tight">
-            The Next Generation of Eggs
+        <section className="cartoon-panel p-8">
+          <h1 className="text-4xl font-black mb-6 text-center leading-tight uppercase italic tracking-tighter text-black">
+            Next Gen Eggs?
           </h1>
           
-          <p className="text-lg text-muted-soft text-center mb-8 leading-relaxed">
-            Would you buy one or all the early supporter NFT to launch the token that will be used for the next generation of the eggs project?
+          <p className="text-xl font-medium text-muted text-center mb-8 leading-relaxed">
+            Support the launch of the new token for the next generation of the eggs project!
             <br />
-            <span className="text-sm text-accent-3 mt-3 block font-bold">
-              (All income will go for initial liquidity pool)
+            <span className="text-sm text-accent mt-3 block font-bold uppercase tracking-widest bg-yellow-200 inline-block px-2 py-1 rounded-lg border-2 border-black">
+              All income goes to Liquidity Pool
             </span>
           </p>
 
           {!isConnected ? (
-             <div className="text-center py-4 text-accent">
-                Please login with your wallet to vote.
+             <div className="text-center py-4 text-black font-bold text-lg bg-yellow-100 border-4 border-dashed border-black rounded-2xl">
+                Connect your wallet to vote!
              </div>
           ) : !voted ? (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-5">
               <button
                 disabled={loading}
                 onClick={() => handleVote('yes')}
-                className="flex items-center justify-center gap-3 bg-gradient-to-b from-green-500 to-green-700 text-white py-4 rounded-2xl font-bold uppercase tracking-wider shadow-lg hover:scale-105 transition-all"
+                className="cartoon-button-yes flex items-center justify-center gap-3 text-black py-5 rounded-2xl font-black text-xl uppercase tracking-wider hover:translate-x-[-2px] hover:translate-y-[-2px] hover:box-shadow-[6px_6px_0px_#000]"
               >
-                {loading ? <Loader2 className="animate-spin" /> : <CheckCircle2 />}
-                Yes, Count me in
+                {loading ? <Loader2 className="animate-spin" /> : <CheckCircle2 strokeWidth={3} />}
+                Yes, Count me in!
               </button>
               <button
                 disabled={loading}
                 onClick={() => handleVote('no')}
-                className="flex items-center justify-center gap-3 bg-gradient-to-b from-red-500 to-red-700 text-white py-4 rounded-2xl font-bold uppercase tracking-wider shadow-lg hover:scale-105 transition-all opacity-80"
+                className="cartoon-button-no flex items-center justify-center gap-3 text-black py-5 rounded-2xl font-black text-xl uppercase tracking-wider hover:translate-x-[-2px] hover:translate-y-[-2px] hover:box-shadow-[6px_6px_0px_#000]"
               >
-                {loading ? <Loader2 className="animate-spin" /> : <XCircle />}
-                No
+                {loading ? <Loader2 className="animate-spin" /> : <XCircle strokeWidth={3} />}
+                No thanks
               </button>
             </div>
           ) : (
-            <div className="py-6 text-green-400 font-bold flex flex-col items-center gap-3 bg-white/5 rounded-2xl border border-green-500/20">
-              <CheckCircle2 size={48} />
-              <p className="text-xl uppercase tracking-widest">Voted: {choice?.toUpperCase()}</p>
+            <div className="py-8 text-black font-black flex flex-col items-center gap-4 bg-green-100 rounded-3xl border-4 border-black shadow-[4px_4px_0px_#000]">
+              <CheckCircle2 size={64} strokeWidth={3} className="text-green-600" />
+              <p className="text-3xl uppercase italic tracking-tighter">You Voted: {choice?.toUpperCase()}!</p>
             </div>
           )}
         </section>
 
+        {/* Vote Counter Section */}
+        <section className="grid grid-cols-2 gap-6">
+          <div className="cartoon-card p-6 rounded-3xl flex flex-col items-center justify-center bg-green-50">
+            <span className="text-5xl font-black text-green-600">{summary.yes}</span>
+            <span className="text-sm uppercase font-black tracking-widest text-black mt-2">YES!</span>
+          </div>
+          <div className="cartoon-card p-6 rounded-3xl flex flex-col items-center justify-center bg-red-50">
+            <span className="text-5xl font-black text-red-600">{summary.no}</span>
+            <span className="text-sm uppercase font-black tracking-widest text-black mt-2">NOPE</span>
+          </div>
+          <div className="col-span-2 cartoon-card p-4 rounded-3xl flex justify-between items-center px-8 bg-blue-50">
+            <span className="text-lg uppercase font-black tracking-widest text-black">Total Votes</span>
+            <span className="text-3xl font-black text-blue-600">{summary.total}</span>
+          </div>
+        </section>
+
         <section className="w-full">
-          <h2 className="text-xl font-bold mb-6 flex items-center justify-center gap-3 text-muted uppercase tracking-widest">
-            <Users className="text-accent-3" size={20} />
-            Supporters
+          <h2 className="text-2xl font-black mb-6 flex items-center justify-center gap-3 text-black uppercase italic tracking-tighter">
+            <Users className="text-black" size={28} strokeWidth={3} />
+            The Squad
           </h2>
           <div className="grid grid-cols-1 gap-4">
             {yesVoters.length > 0 ? (
               yesVoters.map((voter, i) => (
-                <div key={i} className="bg-bg-soft/40 backdrop-blur p-4 rounded-2xl border border-card-border/30 flex items-center gap-4">
-                  <div className="w-10 h-10 bg-accent-3/10 rounded-full flex items-center justify-center text-accent-3 font-bold border border-accent-3/20">
+                <div key={i} className="cartoon-card p-5 rounded-2xl flex items-center gap-5 hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform">
+                  <div className="w-12 h-12 bg-yellow-300 rounded-full flex items-center justify-center text-black font-black border-4 border-black text-xl shadow-[2px_2px_0px_#000]">
                     {voter.farcasterName ? voter.farcasterName[0].toUpperCase() : 'W'}
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-bold text-ink">
+                    <span className="font-black text-black text-lg">
                       {voter.farcasterName ? `@${voter.farcasterName}` : 'Anonymous'}
                     </span>
-                    <span className="text-[10px] text-muted-soft font-mono">
+                    <span className="text-xs text-muted font-bold">
                       {voter.walletAddress.slice(0, 14)}...
                     </span>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-center text-muted-soft italic opacity-60 py-8 border border-dashed border-card-border/20 rounded-2xl">
-                Be the first to support the next generation!
+              <p className="text-center text-black font-bold italic py-10 border-4 border-dashed border-black rounded-3xl bg-white/50">
+                Waitin' for the first supporter... 🥚
               </p>
             )}
           </div>

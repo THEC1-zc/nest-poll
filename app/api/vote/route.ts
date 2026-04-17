@@ -42,12 +42,21 @@ export async function GET(request: Request) {
       return NextResponse.json(userVote);
     }
 
-    const yesVoters = await prisma.vote.findMany({
-      where: { choice: 'yes' },
-      select: { farcasterName: true, walletAddress: true },
+    const allVotes = await prisma.vote.findMany({
+      select: { choice: true, farcasterName: true, walletAddress: true },
     });
 
-    return NextResponse.json(yesVoters);
+    const summary = {
+      yes: allVotes.filter(v => v.choice === 'yes').length,
+      no: allVotes.filter(v => v.choice === 'no').length,
+      total: allVotes.length
+    };
+
+    const yesVoters = allVotes
+      .filter(v => v.choice === 'yes')
+      .map(v => ({ farcasterName: v.farcasterName, walletAddress: v.walletAddress }));
+
+    return NextResponse.json({ yesVoters, summary });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

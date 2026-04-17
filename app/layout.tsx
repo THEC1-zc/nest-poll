@@ -11,6 +11,22 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "NEST Supporters Poll",
   description: "Join the next generation of Eggs project",
+  other: {
+    "fc:frame": JSON.stringify({
+      version: "next",
+      imageUrl: "https://nest-poll.vercel.app/splash.png",
+      button: {
+        title: "Launch Poll",
+        action: {
+          type: "launch_app",
+          name: "NEST Poll",
+          url: "https://nest-poll.vercel.app",
+          splashImageUrl: "https://nest-poll.vercel.app/splash.png",
+          splashBackgroundColor: "#ffef96",
+        },
+      },
+    }),
+  },
 };
 
 export default async function RootLayout({

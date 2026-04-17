@@ -1,0 +1,8 @@
+{
+  "name": "NEST Poll",
+  "description": "Vote for the next generation of NEST Eggs",
+  "iconUrl": "https://nest-poll.vercel.app/icon.png",
+  "splashImageUrl": "https://nest-poll.vercel.app/splash.png",
+  "splashBackgroundColor": "#0a0a0a",
+  "appUrl": "https://nest-poll.vercel.app"
+}
