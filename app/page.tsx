@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useSignMessage } from 'wagmi';
 import { Loader2, CheckCircle2, XCircle, Users } from 'lucide-react';
 import sdk from '@farcaster/miniapp-sdk';
 import { WalletMenu } from '@/components/WalletMenu';
 
 export default function Home() {
   const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   
   const [loading, setLoading] = useState(false);
   const [voted, setVoted] = useState(false);
@@ -68,13 +69,18 @@ export default function Home() {
 
     setLoading(true);
     try {
+      const message = `I am voting ${voteChoice.toUpperCase()} for NEST Next Gen Eggs poll.`;
+      const signature = await signMessageAsync({ message });
+
       const res = await fetch('/api/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletAddress: address,
           choice: voteChoice,
-          farcasterName: fcUser?.username || null 
+          farcasterName: fcUser?.username || null,
+          signature,
+          message
         }),
       });
 
@@ -82,9 +88,12 @@ export default function Home() {
         setVoted(true);
         setChoice(voteChoice);
         fetchVoters();
+      } else {
+        const errorData = await res.json();
+        alert(errorData.error || 'Vote failed');
       }
     } catch (err) {
-      console.error('Vote failed');
+      console.error('Vote failed', err);
     } finally {
       setLoading(false);
     }

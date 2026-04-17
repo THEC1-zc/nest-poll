@@ -1,12 +1,24 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyMessage } from 'viem';
 
 export async function POST(request: Request) {
   try {
-    const { walletAddress, farcasterName, choice } = await request.json();
+    const { walletAddress, farcasterName, choice, signature, message } = await request.json();
 
-    if (!walletAddress || !choice) {
+    if (!walletAddress || !choice || !signature || !message) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
+    }
+
+    // Verify signature
+    const isValid = await verifyMessage({
+      address: walletAddress as `0x${string}`,
+      message,
+      signature: signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
     // Check if the user has already voted
