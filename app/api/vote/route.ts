@@ -2,11 +2,16 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyMessage } from 'viem';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
-    const { walletAddress, farcasterName, choice, signature, message } = await request.json();
+    const body = await request.json();
+    console.log('POST /api/vote body:', body);
+    const { walletAddress, farcasterName, choice, signature, message } = body;
 
     if (!walletAddress || !choice || !signature || !message) {
+      console.error('Missing data:', { walletAddress, choice, signature: !!signature, message: !!message });
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
@@ -18,6 +23,7 @@ export async function POST(request: Request) {
     });
 
     if (!isValid) {
+      console.error('Invalid signature for wallet:', walletAddress);
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
@@ -27,6 +33,7 @@ export async function POST(request: Request) {
     });
 
     if (existingVote) {
+      console.warn('User already voted:', walletAddress);
       return NextResponse.json({ error: 'You have already voted and cannot change your response.' }, { status: 400 });
     }
 
@@ -34,10 +41,11 @@ export async function POST(request: Request) {
       data: { walletAddress, farcasterName, choice },
     });
 
+    console.log('Vote created:', vote);
     return NextResponse.json(vote);
   } catch (error) {
     console.error('Vote error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error: ' + (error as Error).message }, { status: 500 });
   }
 }
 
@@ -51,6 +59,7 @@ export async function GET(request: Request) {
         where: { walletAddress: address },
         select: { choice: true }
       });
+      console.log('GET /api/vote?address=', address, 'result:', userVote);
       return NextResponse.json(userVote);
     }
 
@@ -70,6 +79,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ yesVoters, summary });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('GET /api/vote error:', error);
+    return NextResponse.json({ error: 'Internal server error: ' + (error as Error).message }, { status: 500 });
   }
 }
