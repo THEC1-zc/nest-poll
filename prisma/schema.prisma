@@ -1,0 +1,17 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Vote {
+  id              Int      @id @default(autoincrement())
+  walletAddress   String   @unique
+  farcasterName   String?
+  choice          String   // "yes" or "no"
+  createdAt       DateTime @default(now())
+}

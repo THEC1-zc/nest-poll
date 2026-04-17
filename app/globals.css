@@ -1,0 +1,122 @@
+:root {
+  --bg: #09162c;
+  --bg-soft: #11284f;
+  --panel: rgba(11, 28, 63, 0.74);
+  --card: rgba(255, 210, 77, 0.14);
+  --card-strong: rgba(255, 210, 77, 0.22);
+  --card-border: rgba(255, 215, 105, 0.3);
+  --ink: #fff6cf;
+  --muted: #f7d766;
+  --muted-soft: rgba(255, 239, 175, 0.78);
+  --accent: #f04731;
+  --accent-soft: rgba(240, 71, 49, 0.16);
+  --accent-2: #3a72ff;
+  --accent-2-soft: rgba(58, 114, 255, 0.16);
+  --accent-3: #ffd447;
+  --shadow: rgba(3, 10, 24, 0.48);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
+  background:
+    linear-gradient(rgba(9, 22, 44, 0.88), rgba(9, 22, 44, 0.95)),
+    linear-gradient(180deg, #143160 0%, var(--bg-soft) 38%, var(--bg) 100%);
+  background-size: cover;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.wallet-menu {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.wallet-menu-shell {
+  display: grid;
+  justify-items: center;
+}
+
+.wallet-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid rgba(241, 90, 63, 0.9);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff1bd;
+  cursor: pointer;
+}
+
+.wallet-menu-trigger-connected {
+  border-color: rgba(122, 242, 146, 0.95);
+}
+
+.wallet-menu-popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 50;
+  display: grid;
+  gap: 10px;
+  min-width: 180px;
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 215, 105, 0.2);
+  background: linear-gradient(180deg, rgba(8, 21, 47, 0.98), rgba(17, 40, 79, 0.96));
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+}
+
+.connect-button, .disconnect-button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 999px;
+  border: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.connect-button-farcaster {
+  background: linear-gradient(135deg, #4b78ff, #2746b6);
+  color: white;
+}
+
+.disconnect-button {
+  background: linear-gradient(135deg, #f04731, #a91f1f);
+  color: white;
+}
+
+.wallet-avatar {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 212, 71, 0.14);
+  color: #fff0b0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.wallet-identity-chip {
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 11px;
+  text-align: left;
+}
+
+.wallet-identity-chip strong {
+  display: block;
+  color: var(--accent-3);
+}
