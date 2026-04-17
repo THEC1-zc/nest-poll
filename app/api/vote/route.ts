@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 import { verifyMessage } from 'viem';
-import { Prisma } from '@/generated/prisma/index.js';
+import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,19 +30,20 @@ export async function POST(request: Request) {
     }
 
     try {
-      const vote = await prisma.vote.create({
-        data: {
-          walletAddress: normalizedAddress,
-          farcasterName,
-          choice,
-        },
+      await db.execute({
+        sql: 'INSERT INTO Vote (walletAddress, farcasterName, choice) VALUES (?, ?, ?)',
+        args: [normalizedAddress, farcasterName, choice],
       });
 
-      return NextResponse.json(vote);
+      return NextResponse.json({
+        walletAddress: normalizedAddress,
+        farcasterName,
+        choice,
+      });
     } catch (error) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
+        error instanceof Error &&
+        error.message.includes('UNIQUE constraint failed: Vote.walletAddress')
       ) {
         return NextResponse.json(
           { error: 'You have already voted and cannot change your response.' },
@@ -65,16 +65,23 @@ export async function GET(request: Request) {
     const address = searchParams.get('address');
 
     if (address) {
-      const userVote = await prisma.vote.findUnique({
-        where: { walletAddress: address.toLowerCase() },
-        select: { choice: true }
+      const result = await db.execute({
+        sql: 'SELECT choice FROM Vote WHERE walletAddress = ? LIMIT 1',
+        args: [address.toLowerCase()],
       });
-      return NextResponse.json(userVote);
+
+      const row = result.rows[0] as { choice?: string } | undefined;
+      return NextResponse.json(row?.choice ? { choice: row.choice } : null);
     }
 
-    const allVotes = await prisma.vote.findMany({
-      select: { choice: true, farcasterName: true, walletAddress: true },
+    const result = await db.execute({
+      sql: 'SELECT choice, farcasterName, walletAddress FROM Vote ORDER BY createdAt DESC',
     });
+    const allVotes = result.rows.map((row) => ({
+      choice: String(row.choice),
+      farcasterName: row.farcasterName ? String(row.farcasterName) : null,
+      walletAddress: String(row.walletAddress),
+    }));
 
     const summary = {
       yes: allVotes.filter(v => v.choice === 'yes').length,
